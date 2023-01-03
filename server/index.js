@@ -10,10 +10,6 @@ const app = express();
 // ----------------------------------
 // Routes
 // ----------------------------------
-app.get("/", (req, res) => {
-  res.send("Hello World from Server!");
-});
-
 app.post("/alibabaslider", async (req, res) => {
   try {
     const array = generateArray();
@@ -35,11 +31,13 @@ app.post("/alibabaslider", async (req, res) => {
       if (request.url().includes("cf.aliyun.com/nocaptcha/analyze")) {
         request.abort();
         analayzetoken = request.url();
+        console.log("Analyze Token:", analayzetoken);
+        console.log("----------------------------------");
+
         return;
       }
       if (request.url().includes("checkPhoneNumberInput/?&_tb_token")) {
         tbtokenurl = request.url();
-        return;
       }
       request.continue();
     });
@@ -50,7 +48,7 @@ app.post("/alibabaslider", async (req, res) => {
     page.keyboard.type("18555032657");
     const elements = await page.$x("//div[3]/div[1]/form/div[2]/button");
     await elements[0].click();
-    await new Promise((r) => setTimeout(r, 5000));
+    await new Promise((r) => setTimeout(r, 7000));
     const sliderElement = await page.$(".slidetounlock");
     const slider = await sliderElement.boundingBox(); //kbire
     const sliderHandle = await page.$(".nc_iconfont.btn_slide");
@@ -80,13 +78,13 @@ app.post("/alibabaslider", async (req, res) => {
 // ----------------------------------
 // Run App
 // ----------------------------------
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, (error) => {
   if (error) {
     console.log(`Error while starting server: ${error}`);
   } else {
     console.log(`----------------------------------`);
-    console.log(`Server running on port ${PORT}`);
+    console.log(`Server ${process.env.SERVER_ID} running on port ${PORT}`);
     console.log(`----------------------------------`);
   }
 });
