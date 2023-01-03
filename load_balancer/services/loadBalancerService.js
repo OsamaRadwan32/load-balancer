@@ -1,5 +1,7 @@
 var request = require("request");
 
+let serverIterator = 0;
+
 const serverList = [
   {
     server_id: 1,
@@ -23,22 +25,28 @@ const serverList = [
   },
 ];
 
-const queueManager = async (request, response, serverIterator) => {
+// @desc
+const queueManager = async (req, res) => {
   try {
-    const serverResponse = await sendRequestToServer(request, serverIterator);
+    serverIterator++;
+    if (serverIterator > 4) {
+      serverIterator = 1;
+    }
+    const serverResponse = await sendRequestToServer(req, serverIterator);
     return serverResponse.body;
   } catch (error) {
     return error;
   }
 };
 
-// @desc Get Account Managers
-const sendRequestToServer = async (appName, serverId) => {
-  console.log(serverList[serverId - 1].ip_address);
+// @desc
+const sendRequestToServer = async (appName, serverIterator) => {
+  serverId = serverIterator - 1;
+  console.log(serverList[serverId].ip_address);
 
   var options = {
     method: "POST",
-    url: serverList[serverId - 1].ip_address + ":5000/alibabaslider",
+    url: `${serverList[serverId].ip_address}:5000/alibabaslider`,
     headers: {},
   };
 

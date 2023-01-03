@@ -1,5 +1,6 @@
 const http = require("node:http");
 
+// @desc
 const processHandler = async (req, res) => {
   request = req.body;
   response = {
@@ -8,6 +9,7 @@ const processHandler = async (req, res) => {
   };
 };
 
+// @desc
 const setProcessStatus = async (req, res) => {
   const postData = JSON.stringify({
     activity_status: "true",
@@ -45,49 +47,6 @@ const setProcessStatus = async (req, res) => {
   req.end();
 };
 
-// ---------------------------------------------------------------
-// ---------------------------------------------------------------
-// ---------------------------------------------------------------
-// const returnRequestResult = async (req, res) => {
-//   const postData = JSON.stringify({
-//     activity_status: "true",
-//   });
-
-//   const processStatus = {
-//     hostname: "http://localhost",
-//     port: 3000,
-//     path: "/requestResult",
-//     method: "POST",
-//     headers: {
-//       "Content-Type": "application/json",
-//       "Content-Length": Buffer.byteLength(postData),
-//     },
-//   };
-
-//   const req = http.request(processStatus, (res) => {
-//     console.log(`STATUS: ${res.statusCode}`);
-//     console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
-//     res.setEncoding("utf8");
-//     res.on("data", (chunk) => {
-//       console.log(`BODY: ${chunk}`);
-//     });
-//     res.on("end", () => {
-//       console.log("No more data in response.");
-//     });
-//   });
-
-//   req.on("error", (error) => {
-//     console.error(`problem with request: ${error.message}`);
-//   });
-
-//   // Write data to request body
-//   req.write(postData);
-//   req.end();
-// };
-
-// ---------------------------------------------------------------
-// ---------------------------------------------------------------
-// ---------------------------------------------------------------
 function randomIntFromInterval(min, max) {
   // min and max included
   return Math.floor(Math.random() * (max - min + 1) + min);
@@ -133,7 +92,46 @@ function generateArray() {
 module.exports = {
   processHandler,
   setProcessStatus,
-  // returnRequestResult,
   randomIntFromInterval,
   generateArray,
 };
+
+// ---------------------------------------------------------------
+// ---------------------------------------------------------------
+// ---------------------------------------------------------------
+// const returnRequestResult = async (req, res) => {
+//   const postData = JSON.stringify({
+//     activity_status: "true",
+//   });
+
+//   const processStatus = {
+//     hostname: "http://localhost",
+//     port: 3000,
+//     path: "/requestResult",
+//     method: "POST",
+//     headers: {
+//       "Content-Type": "application/json",
+//       "Content-Length": Buffer.byteLength(postData),
+//     },
+//   };
+
+//   const req = http.request(processStatus, (res) => {
+//     console.log(`STATUS: ${res.statusCode}`);
+//     console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
+//     res.setEncoding("utf8");
+//     res.on("data", (chunk) => {
+//       console.log(`BODY: ${chunk}`);
+//     });
+//     res.on("end", () => {
+//       console.log("No more data in response.");
+//     });
+//   });
+
+//   req.on("error", (error) => {
+//     console.error(`problem with request: ${error.message}`);
+//   });
+
+//   // Write data to request body
+//   req.write(postData);
+//   req.end();
+// };

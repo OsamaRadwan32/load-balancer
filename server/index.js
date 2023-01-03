@@ -1,7 +1,7 @@
 const express = require("express");
 const puppeteer = require("puppeteer");
 const dotenv = require("dotenv");
-const { generateArray } = require("../server_1/services/serverService");
+const { generateArray } = require("../server/services/serverService");
 
 dotenv.config();
 
@@ -11,11 +11,10 @@ const app = express();
 // Routes
 // ----------------------------------
 app.get("/", (req, res) => {
-  res.send("Hello World from Server 1!");
+  res.send("Hello World from Server!");
 });
 
 app.post("/alibabaslider", async (req, res) => {
-  console.log("Posting");
   try {
     const array = generateArray();
     console.log(array);
@@ -30,11 +29,16 @@ app.post("/alibabaslider", async (req, res) => {
         get: () => false,
       });
     });
-    let url = null;
+    let analayzetoken = null;
+    let tbtokenurl = null;
     page.on("request", (request) => {
       if (request.url().includes("cf.aliyun.com/nocaptcha/analyze")) {
         request.abort();
-        url = request.url();
+        analayzetoken = request.url();
+        return;
+      }
+      if (request.url().includes("checkPhoneNumberInput/?&_tb_token")) {
+        tbtokenurl = request.url();
         return;
       }
       request.continue();
@@ -62,7 +66,10 @@ app.post("/alibabaslider", async (req, res) => {
       i += 1;
     }
     await page.mouse.up();
-    res.send(url);
+    res.send({
+      analayze: analayzetoken,
+      tbtokenurl: tbtokenurl,
+    });
     await browser.close();
   } catch (error) {
     console.log(error);
@@ -79,7 +86,7 @@ app.listen(PORT, (error) => {
     console.log(`Error while starting server: ${error}`);
   } else {
     console.log(`----------------------------------`);
-    console.log(`Server 1 running on port ${PORT}`);
+    console.log(`Server running on port ${PORT}`);
     console.log(`----------------------------------`);
   }
 });
