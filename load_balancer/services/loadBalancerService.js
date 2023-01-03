@@ -33,6 +33,8 @@ const queueManager = async (req, res) => {
       serverIterator = 1;
     }
     const serverResponse = await sendRequestToServer(req, serverIterator);
+    console.log(`Server ${serverIterator + 10} Response:`, serverResponse.body);
+    console.log("----------------------------------");
     return serverResponse.body;
   } catch (error) {
     return error;
@@ -46,7 +48,7 @@ const sendRequestToServer = async (appName, serverIterator) => {
 
   var options = {
     method: "POST",
-    url: `${serverList[serverId].ip_address}:5000/alibabaslider`,
+    url: serverList[serverId].ip_address + ":5000/alibabaslider",
     headers: {},
   };
 
