@@ -2,6 +2,7 @@ const express = require("express");
 const puppeteer = require("puppeteer");
 const dotenv = require("dotenv");
 const { generateArray } = require("../server/services/serverService");
+const UserAgent = require("user-agents");
 
 dotenv.config();
 
@@ -12,11 +13,17 @@ const app = express();
 // ----------------------------------
 app.post("/alibabaslider", async (req, res) => {
   try {
+    const userAgent = new UserAgent({
+      deviceCategory: "desktop",
+      platform: "Linux x86_64",
+    });
     const array = generateArray();
     console.log(array);
     const browser = await puppeteer.launch({
       headless: false,
       defaultViewport: { width: 1366, height: 768 },
+      ignoreDefaultArgs: [],
+      timeout: 3000,
     });
     const page = await browser.newPage();
     page.setRequestInterception(true);
@@ -33,7 +40,6 @@ app.post("/alibabaslider", async (req, res) => {
         analayzetoken = request.url();
         console.log("Analyze Token:", analayzetoken);
         console.log("----------------------------------");
-
         return;
       }
       if (request.url().includes("checkPhoneNumberInput/?&_tb_token")) {
@@ -41,7 +47,13 @@ app.post("/alibabaslider", async (req, res) => {
       }
       request.continue();
     });
-    await page.goto("https://damo.alibaba.com/user/signup/?");
+    await page.setUserAgent(userAgent.data.userAgent);
+    await page.goto("https://damo.alibaba.com/user/signup/?", { timeout: 0 });
+    const html = await page.content();
+    const reg = 'token" content="([^"]*)';
+    const matches = html.match(reg);
+    matches[1];
+
     // const elements = await page.$x('/html/body/div[3]/div[1]/form/div[1]/div/div[1]')
     // await elements[0].click()
     await page.focus(".phone");
@@ -67,11 +79,13 @@ app.post("/alibabaslider", async (req, res) => {
     res.send({
       analayze: analayzetoken,
       tbtokenurl: tbtokenurl,
+      csrftoken: matches[1],
+      userAgent: userAgent.data.userAgent,
     });
     await browser.close();
   } catch (error) {
     console.log(error);
-    res.send("error");
+    res.send(error);
   }
 });
 

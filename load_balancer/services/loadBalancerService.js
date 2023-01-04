@@ -1,40 +1,70 @@
 var request = require("request");
+var queue = require("../");
 
+let requestCounter = 1;
 let serverIterator = 0;
+var queueArr = [];
 
 const serverList = [
   {
     server_id: 1,
     ip_address: "http://10.110.99.38",
-    port_number: 1,
+    workspace: 11,
   },
   {
     server_id: 2,
     ip_address: "http://10.110.99.49",
-    port_number: 2,
+    workspace: 12,
   },
   {
     server_id: 3,
     ip_address: "http://10.110.99.8",
-    port_number: 3,
+    workspace: 13,
   },
   {
     server_id: 4,
     ip_address: "http://10.110.99.56",
-    port_number: 4,
+    workspace: 14,
+  },
+  {
+    server_id: 5,
+    ip_address: "http://10.110.199.11",
+    workspace: 15,
+  },
+  {
+    server_id: 6,
+    ip_address: "http://10.110.99.23",
+    workspace: 16,
+  },
+  {
+    server_id: 7,
+    ip_address: "http://10.110.199.57",
+    workspace: 17,
+  },
+  {
+    server_id: 8,
+    ip_address: "http://10.110.199.55",
+    workspace: 20,
+  },
+  {
+    server_id: 9,
+    ip_address: "http://10.110.199.15",
+    workspace: 21,
   },
 ];
 
 // @desc
-const queueManager = async (req, res) => {
+const requestHandler = async (req, res) => {
   try {
+    // console.log("Request Count: ", requestCounter);
     serverIterator++;
-    if (serverIterator > 4) {
+    if (serverIterator > 9) {
       serverIterator = 1;
     }
     const serverResponse = await sendRequestToServer(req, serverIterator);
-    console.log(`Server ${serverIterator + 10} Response:`, serverResponse.body);
+    console.log(serverResponse.body);
     console.log("----------------------------------");
+    requestCounter++;
     return serverResponse.body;
   } catch (error) {
     return error;
@@ -44,7 +74,10 @@ const queueManager = async (req, res) => {
 // @desc
 const sendRequestToServer = async (appName, serverIterator) => {
   serverId = serverIterator - 1;
-  console.log(serverList[serverId].ip_address);
+  console.log(
+    `IP Address of Server ${serverIterator + 10}:`,
+    serverList[serverId].ip_address
+  );
 
   var options = {
     method: "POST",
@@ -69,6 +102,24 @@ const sendRequestToServer = async (appName, serverIterator) => {
   });
 };
 
+// @desc
+const queueManager = async (req, res) => {
+  try {
+    serverIterator++;
+    if (serverIterator > 4) {
+      serverIterator = 1;
+    }
+    queueArr.push({ serverIterator, req });
+    const serverResponse = await sendRequestToServer(req, serverIterator);
+    console.log(`Server ${serverIterator + 10} Response:`, serverResponse.body);
+    console.log("----------------------------------");
+    return serverResponse.body;
+  } catch (error) {
+    return error;
+  }
+};
+
 module.exports = {
+  requestHandler,
   queueManager,
 };

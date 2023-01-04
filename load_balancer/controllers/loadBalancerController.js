@@ -1,8 +1,11 @@
-const { queueManager } = require("../services/loadBalancerService");
+const {
+  queueManager,
+  requestHandler,
+} = require("../services/loadBalancerService");
 
 const processRequest = async (req, res) => {
   try {
-    const serverResponse = await queueManager(req, res);
+    const serverResponse = await requestHandler(req, res);
     res.status(200).json(serverResponse);
   } catch (error) {
     console.log(error);
