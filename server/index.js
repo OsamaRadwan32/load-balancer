@@ -76,13 +76,13 @@ app.post("/alibabaslider", async (req, res) => {
       i += 1;
     }
     await page.mouse.up();
+    await browser.close();
     res.send({
       analayze: analayzetoken,
       tbtokenurl: tbtokenurl,
       csrftoken: matches[1],
       userAgent: userAgent.data.userAgent,
     });
-    await browser.close();
   } catch (error) {
     console.log(error);
     res.send(error);
