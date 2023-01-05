@@ -1,9 +1,8 @@
 var request = require("request");
-var queue = require("../");
+// var queue = require("../");
 
-let requestCounter = 1;
 let serverIterator = 0;
-var queueArr = [];
+// var queueArr = [];
 
 const serverList = [
   {
@@ -56,32 +55,53 @@ const serverList = [
 // @desc
 const requestHandler = async (req, res) => {
   try {
-    // console.log("Request Count: ", requestCounter);
     serverIterator++;
     if (serverIterator > 9) {
       serverIterator = 1;
     }
-    const serverResponse = await sendRequestToServer(req, serverIterator);
-    console.log(serverResponse.body);
-    console.log("----------------------------------");
-    requestCounter++;
-    return serverResponse.body;
+    const serverResponse = await handlerMiddleware(req, serverIterator);
+    // console.log("Server Id:", serverResponse.serverId);
+    // console.log("Server IP Address:", serverResponse.ipAddress);
+    // console.log("Workspace:", serverResponse.workspace);
+    // console.log("Server Response:", serverResponse.serverResponse);
+    // console.log(
+    //   "--------------------------------------------------------------------"
+    // );
+    return serverResponse.serverResponse;
   } catch (error) {
     return error;
   }
 };
 
 // @desc
-const sendRequestToServer = async (appName, serverIterator) => {
-  serverId = serverIterator - 1;
-  console.log(
-    `IP Address of Server ${serverIterator + 10}:`,
-    serverList[serverId].ip_address
-  );
+const handlerMiddleware = async (req, serverId) => {
+  try {
+    serverIdIndex = serverId - 1;
+    ipAddress = serverList[serverIdIndex].ip_address;
+    const serverResponse = await sendRequestToServer(req, ipAddress);
+    console.log("Server Id:", serverId);
+    console.log("Server IP Address:", ipAddress);
+    console.log("Workspace:", serverList[serverIdIndex].workspace);
+    console.log("Server Response:", serverResponse.body);
+    console.log(
+      "--------------------------------------------------------------------"
+    );
+    return {
+      serverId: serverId,
+      ipAddress: ipAddress,
+      workspace: serverList[serverIdIndex].workspace,
+      serverResponse: serverResponse.body,
+    };
+  } catch (error) {
+    return error;
+  }
+};
 
+// @desc
+const sendRequestToServer = async (appName, ipAddress) => {
   var options = {
     method: "POST",
-    url: serverList[serverId].ip_address + ":5000/alibabaslider",
+    url: ipAddress + ":5000/alibabaslider",
     headers: {},
   };
 
@@ -103,23 +123,23 @@ const sendRequestToServer = async (appName, serverIterator) => {
 };
 
 // @desc
-const queueManager = async (req, res) => {
-  try {
-    serverIterator++;
-    if (serverIterator > 4) {
-      serverIterator = 1;
-    }
-    queueArr.push({ serverIterator, req });
-    const serverResponse = await sendRequestToServer(req, serverIterator);
-    console.log(`Server ${serverIterator + 10} Response:`, serverResponse.body);
-    console.log("----------------------------------");
-    return serverResponse.body;
-  } catch (error) {
-    return error;
-  }
-};
+// const queueManager = async (req, res) => {
+//   try {
+//     serverIterator++;
+//     if (serverIterator > 4) {
+//       serverIterator = 1;
+//     }
+//     queueArr.push({ serverIterator, req });
+//     const serverResponse = await sendRequestToServer(req, serverIterator);
+//     console.log(`Server ${serverIterator + 10} Response:`, serverResponse.body);
+//     console.log("----------------------------------");
+//     return serverResponse.body;
+//   } catch (error) {
+//     return error;
+//   }
+// };
 
 module.exports = {
   requestHandler,
-  queueManager,
+  // queueManager,
 };
