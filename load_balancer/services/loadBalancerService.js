@@ -1,8 +1,6 @@
-var request = require("request");
-// var queue = require("../");
+let request = require("request");
 
 let serverIterator = 0;
-// var queueArr = [];
 
 const serverList = [
   {
@@ -60,13 +58,6 @@ const requestHandler = async (req, res) => {
       serverIterator = 1;
     }
     const serverResponse = await handlerMiddleware(req, serverIterator);
-    // console.log("Server Id:", serverResponse.serverId);
-    // console.log("Server IP Address:", serverResponse.ipAddress);
-    // console.log("Workspace:", serverResponse.workspace);
-    // console.log("Server Response:", serverResponse.serverResponse);
-    // console.log(
-    //   "--------------------------------------------------------------------"
-    // );
     return serverResponse.serverResponse;
   } catch (error) {
     return error;
@@ -78,11 +69,17 @@ const handlerMiddleware = async (req, serverId) => {
   try {
     serverIdIndex = serverId - 1;
     ipAddress = serverList[serverIdIndex].ip_address;
-    const serverResponse = await sendRequestToServer(req, ipAddress);
-    console.log("Server Id:", serverId);
-    console.log("Server IP Address:", ipAddress);
-    console.log("Workspace:", serverList[serverIdIndex].workspace);
-    console.log("Server Response:", serverResponse.body);
+    workspace = serverList[serverIdIndex].workspace;
+    const serverResponse = await sendRequestToServer(
+      req,
+      serverId,
+      ipAddress,
+      workspace
+    );
+    console.log("Server Id:", serverResponse.serverId);
+    console.log("Server IP Address:", serverResponse.ipAddress);
+    console.log("Workspace:", serverResponse.workspace);
+    console.log("Server Response:", serverResponse.response.body);
     console.log(
       "--------------------------------------------------------------------"
     );
@@ -98,8 +95,8 @@ const handlerMiddleware = async (req, serverId) => {
 };
 
 // @desc
-const sendRequestToServer = async (appName, ipAddress) => {
-  var options = {
+const sendRequestToServer = async (appName, serverId, ipAddress, workspace) => {
+  let options = {
     method: "POST",
     url: ipAddress + ":5000/alibabaslider",
     headers: {},
@@ -111,6 +108,12 @@ const sendRequestToServer = async (appName, ipAddress) => {
     });
 
     req.on("response", (res) => {
+      resolve({
+        serverId: serverId,
+        ipAddress: ipAddress,
+        workspace: workspace,
+        response: res,
+      });
       resolve(res);
     });
 
